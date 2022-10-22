@@ -1,0 +1,99 @@
+<!--I.M.Pei @ Boston | Yangyang Yang | NWMEDIA205 2022-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css"> 
+    <title> Ieoh Ming Pei @ Boston </title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css' rel='stylesheet' />
+</head>
+    
+<body>
+
+    <div class="split left">
+      <div class="centered">
+        <img src="img_avatar2.png" alt="Avatar woman">
+        <h2>Jane Flex</h2>
+        <p>Some text.</p>
+      </div>
+    </div>
+
+    <div class="split right">
+        <div id='map'></div>
+            <script>
+                mapboxgl.accessToken = 'pk.eyJ1IjoieXl5YW5nMjMiLCJhIjoiY2w5MXpsOTB6MWVmNTN1cDhxamJtemN1ZSJ9.PepPtd9YyhuPZKjshj4IYw';
+
+                var map = new mapboxgl.Map({
+                  container: 'map', // container id
+                  style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
+                  center: [-122.25, 37.87], // starting position
+                  zoom: 12 // starting zoom
+                });
+
+                var geolocate = new mapboxgl.GeolocateControl({
+                  positionOptions: {
+                    enableHighAccuracy: true
+                  },
+                    trackUserLocation: true
+                });
+
+                // map.on(functions) at the bottom!
+                map.addControl(geolocate);
+                map.on('load', function() {
+                    geolocate.trigger();
+                    map.addSource('points', {
+                      type: 'geojson',
+                      data: 'https://raw.githubusercontent.com/cwilmott/locativemedia/main/data/campus.geojson'
+                  });
+                map.addLayer({
+                    id: 'points-layer',
+                    type: 'symbol',
+                    source: 'points',
+                    layout: {
+                      'icon-image': 'park-15', // more icons here: https://labs.mapbox.com/maki-icons/editor/
+                      'icon-allow-overlap': true
+                  },
+                  paint: { }
+                });
+                map.on('click', 'points-layer', (e) => {
+                    // setting up some constants below.
+                    const coordinates = e.features[0].geometry.coordinates.slice();
+                    const title = e.features[0].properties["Name"];
+                    const description = e.features[0].properties["Description"];
+
+                    // Ensure that if the map is zoomed out such that multiple
+                    // copies of the feature are visible, the popup appearss
+                    // over the copy being pointed to.
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
+
+                    new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(`<h3>${title}</h3><p>${description}</p>`)// you can use html styling here
+                    .addTo(map);
+                });
+
+                });
+
+          </script>
+    </div>   
+</body>   
+</html> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
